@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SessionAndStateMangement.Models;
 using System;
@@ -20,9 +21,33 @@ namespace SessionAndStateMangement.Controllers
 
         public IActionResult Index()
         {
+            if(Request.Cookies["name"]!=null)
+            {
+                ViewBag.message = Request.Cookies["name"];
+            }
+            else
+            {
+                ViewBag.message = "Not Available";
+            }
             return View();
         }
+        [HttpPost]
+        public IActionResult Index(IFormCollection fc)
+        {
+            CookieOptions options = new CookieOptions();
+            options.Expires = DateTime.Now.AddDays(2);
+            Response.Cookies.Append("name", fc["txtCookie"], options);
+            return RedirectToAction("Index","Home");
+        }
+        public IActionResult DeleteCookie()
+        {
+            if (Request.Cookies["name"] != null)
+            {
+                Response.Cookies.Delete("name");
+            }
 
+            return RedirectToAction("Index", "Home");
+        }
         public IActionResult Privacy()
         {
             return View();
